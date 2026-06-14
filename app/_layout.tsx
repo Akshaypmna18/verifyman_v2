@@ -16,11 +16,12 @@ export {
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
   const primaryColor = THEME[colorScheme ?? 'light'].primary;
+  const tabBarColor = THEME[colorScheme ?? 'light'].card;
 
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <NativeTabs tintColor={primaryColor}>
+      <NativeTabs tintColor={primaryColor} backgroundColor={tabBarColor}>
         <NativeTabs.Trigger name="index">
           <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
           <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
