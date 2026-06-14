@@ -1,87 +1,21 @@
 import { Screen } from '@/components/screen';
 import { ListRow } from '@/components/ui/list-row';
 import { Text } from '@/components/ui/text';
-import { useRouter } from 'expo-router';
 import {
-  Bell,
-  Building2,
-  CreditCard,
-  FileText,
-  HelpCircle,
-  Lock,
-  LogOut,
-  Settings,
-  Shield,
-  Users,
-} from 'lucide-react-native';
-import type { LucideIcon } from 'lucide-react-native';
+  MOCK_ACCOUNT,
+  MOCK_SETTINGS_SECTIONS,
+  getMockUsageStats,
+} from '@/lib/mock-backend';
+import { useRouter } from 'expo-router';
+import { LogOut } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { IconChipTone } from '@/components/ui/icon-chip';
-import type { Href } from 'expo-router';
-
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const USER = {
-  name: 'Junaid Paramberi',
-  role: 'HR Manager',
-  company: 'Rentowl LLP',
-  email: 'junaidparamberi@gmail.com',
-  initials: 'JP',
-  plan: 'Pro Plan',
-  memberSince: 'Jan 2025',
-};
-
-const USAGE = [
-  { label: 'Submitted', value: '148' },
-  { label: 'Cleared', value: '127' },
-  { label: 'Pending', value: '14' },
-];
-
-type SettingsItem = {
-  icon: LucideIcon;
-  label: string;
-  tone: IconChipTone;
-  value?: string;
-  route?: Href;
-};
-
-type SettingsSection = {
-  title: string;
-  items: SettingsItem[];
-};
-
-const SETTINGS_SECTIONS: SettingsSection[] = [
-  {
-    title: 'Account',
-    items: [
-      { icon: Settings,  label: 'Edit Profile',      tone: 'slate' },
-      { icon: Lock,      label: 'Change Password',   tone: 'slate' },
-      { icon: Bell,      label: 'Notifications',     tone: 'blue'  },
-    ],
-  },
-  {
-    title: 'Company',
-    items: [
-      { icon: Building2, label: 'Company Settings',  tone: 'brand' },
-      { icon: Users,     label: 'Team Members',      tone: 'brand' },
-      { icon: CreditCard,label: 'Billing & Plan',    tone: 'amber', value: 'Pro' },
-    ],
-  },
-  {
-    title: 'Support',
-    items: [
-      { icon: HelpCircle,label: 'Help Centre',       tone: 'slate' },
-      { icon: Shield,    label: 'Privacy Policy',    tone: 'slate' },
-      { icon: FileText,  label: 'Terms of Service',  tone: 'slate' },
-    ],
-  },
-];
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
   const router = useRouter();
+  const usage = getMockUsageStats();
 
   return (
     <Screen scrollable contentClassName="px-0 py-0">
@@ -94,7 +28,7 @@ export default function ProfilePage() {
               className="text-[28px] font-black text-primary-foreground"
               style={{ letterSpacing: 0.5 }}
             >
-              {USER.initials}
+              {MOCK_ACCOUNT.initials}
             </Text>
           </View>
 
@@ -104,20 +38,20 @@ export default function ProfilePage() {
               className="text-[22px] font-extrabold text-foreground"
               style={{ letterSpacing: -0.5 }}
             >
-              {USER.name}
+              {MOCK_ACCOUNT.name}
             </Text>
             <Text className="text-[14px] font-semibold text-muted-foreground">
-              {USER.role}
+              {MOCK_ACCOUNT.role}
             </Text>
             <Text className="text-[13px] font-medium text-muted-foreground">
-              {USER.company}
+              {MOCK_ACCOUNT.company}
             </Text>
           </View>
 
           {/* Plan chip */}
           <View className="bg-primary/15 border border-primary/25 rounded-full px-3 py-1">
             <Text className="text-[11px] font-extrabold tracking-widest uppercase text-primary">
-              {USER.plan}
+              {MOCK_ACCOUNT.plan}
             </Text>
           </View>
         </View>
@@ -134,12 +68,12 @@ export default function ProfilePage() {
           </View>
           {/* Stats row */}
           <View className="flex-row">
-            {USAGE.map((u, idx) => (
+            {usage.map((u, idx) => (
               <View
                 key={u.label}
                 className="flex-1 items-center py-4"
                 style={{
-                  borderRightWidth: idx < USAGE.length - 1 ? 1 : 0,
+                  borderRightWidth: idx < usage.length - 1 ? 1 : 0,
                   borderRightColor: 'hsl(var(--border))',
                 }}
               >
@@ -160,7 +94,7 @@ export default function ProfilePage() {
 
       {/* Settings sections */}
       <View className="px-4 pt-5 gap-4">
-        {SETTINGS_SECTIONS.map((section) => (
+        {MOCK_SETTINGS_SECTIONS.map((section) => (
           <View key={section.title}>
             <Text className="text-[11px] font-extrabold tracking-widest uppercase text-muted-foreground mb-2 px-1">
               {section.title}
@@ -173,7 +107,7 @@ export default function ProfilePage() {
                     label={item.label}
                     tone={item.tone}
                     value={item.value}
-                    onPress={() => router.push(item.route ?? '/settings')}
+                    onPress={() => router.push('/settings')}
                   />
                   {idx < section.items.length - 1 && (
                     <View className="h-px bg-border mx-4" />
@@ -187,7 +121,7 @@ export default function ProfilePage() {
         {/* App version */}
         <View className="px-1">
           <Text className="text-[12px] font-medium text-muted-foreground text-center">
-            Verifyman v1.0.0 · Member since {USER.memberSince}
+            Verifyman v1.0.0 · Member since {MOCK_ACCOUNT.memberSince}
           </Text>
         </View>
 

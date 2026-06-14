@@ -1,1 +1,3 @@
-export const MOCK_NOTIFICATION_COUNT = 3;
+import { getMockNotificationCount } from './mock-backend';
+
+export const MOCK_NOTIFICATION_COUNT = getMockNotificationCount();

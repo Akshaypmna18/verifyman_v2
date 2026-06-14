@@ -1,5 +1,13 @@
 import { PageHeader } from '@/components/PageHeader';
 import { MOCK_NOTIFICATION_COUNT } from '@/lib/mock-notifications';
+import {
+  MOCK_ACCOUNT,
+  MOCK_QUICK_ACTIONS,
+  MOCK_VERIFICATION_REQUESTS,
+  VERIFICATION_TYPE_META,
+  getMockDashboardStats,
+  mapRequestStatusToBadge,
+} from '@/lib/mock-backend';
 import { Screen } from '@/components/screen';
 import { FAB } from '@/components/ui/fab';
 import { IconChip } from '@/components/ui/icon-chip';
@@ -8,75 +16,19 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { StatCard } from '@/components/ui/stat-card';
 import { Text } from '@/components/ui/text';
 import { useRouter } from 'expo-router';
-import {
-  Briefcase,
-  CheckCircle,
-  Clock,
-  GraduationCap,
-  MapPin,
-  ShieldCheck,
-  TrendingUp,
-  Users,
-} from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-
-const STATS = [
-  { label: 'Total', value: 148, caption: 'This month', icon: Users, tone: 'brand' as const },
-  { label: 'Cleared', value: 127, caption: '85.8% clear rate', icon: CheckCircle, tone: 'brand' as const },
-  { label: 'Running', value: 14, caption: 'In progress', icon: TrendingUp, tone: 'amber' as const },
-  { label: 'Avg time', value: '27m', caption: '−8m vs last mo', icon: Clock, tone: 'blue' as const },
-];
-
-const RECENT_REQUESTS = [
-  {
-    id: 'VM-20260614-148',
-    name: 'Arjun Patel',
-    rid: 'VM-20260614-148',
-    service: 'Identity Verification',
-    serviceIcon: ShieldCheck,
-    date: '14 Jun 2026',
-    status: 'running' as const,
-    priority: 'Normal priority',
-  },
-  {
-    id: 'VM-20260613-147',
-    name: 'Priya Sharma',
-    rid: 'VM-20260613-147',
-    service: 'Employment Verification',
-    serviceIcon: Briefcase,
-    date: '13 Jun 2026',
-    status: 'done' as const,
-    priority: 'High priority',
-  },
-  {
-    id: 'VM-20260612-146',
-    name: 'Vikas Menon',
-    rid: 'VM-20260612-146',
-    service: 'Address Verification',
-    serviceIcon: MapPin,
-    date: '12 Jun 2026',
-    status: 'flag' as const,
-    priority: 'Normal priority',
-  },
-];
+const RECENT_REQUESTS = MOCK_VERIFICATION_REQUESTS.slice(0, 3);
+const STATS = getMockDashboardStats();
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
-
-const QUICK_ACTIONS = [
-  { id: 'identity', label: 'Identity', icon: ShieldCheck, tone: 'brand' as const },
-  { id: 'employment', label: 'Employment', icon: Briefcase, tone: 'blue' as const },
-  { id: 'education', label: 'Education', icon: GraduationCap, tone: 'amber' as const },
-  { id: 'address', label: 'Address', icon: MapPin, tone: 'slate' as const },
-];
 
 function QuickActions({ onSelect }: { onSelect: (id: string) => void }) {
   return (
     <View>
       <SectionHeader title="Quick Request" />
       <View className="flex-row justify-between gap-2">
-        {QUICK_ACTIONS.map((a) => (
+        {MOCK_QUICK_ACTIONS.map((a) => (
           <Pressable
             key={a.id}
             onPress={() => onSelect(a.id)}
@@ -103,7 +55,7 @@ export default function HomePage() {
   return (
     <>
       <PageHeader
-        userInitials="JP"
+        userInitials={MOCK_ACCOUNT.initials}
         notificationCount={MOCK_NOTIFICATION_COUNT}
         onNotificationPress={() => router.push('/alerts')}
         onProfilePress={() => router.push('/profile')}
@@ -115,10 +67,10 @@ export default function HomePage() {
             className="text-[26px] font-extrabold text-foreground"
             style={{ letterSpacing: -0.8, lineHeight: 32 }}
           >
-            Good morning, Junaid 👋
+            Good morning, {MOCK_ACCOUNT.name.split(' ')[0]}
           </Text>
           <Text className="text-[14px] font-semibold text-muted-foreground mt-1">
-            Rentowl LLP · HR Dashboard
+            {MOCK_ACCOUNT.company} · {MOCK_ACCOUNT.role} Dashboard
           </Text>
         </View>
 
@@ -154,14 +106,14 @@ export default function HomePage() {
             {RECENT_REQUESTS.map((r) => (
               <RequestCard
                 key={r.id}
-                name={r.name}
-                rid={r.rid}
-                service={r.service}
-                serviceIcon={r.serviceIcon}
-                date={r.date}
-                status={r.status}
+                name={r.candidateName}
+                rid={r.id}
+                service={VERIFICATION_TYPE_META[r.type].label}
+                serviceIcon={VERIFICATION_TYPE_META[r.type].icon}
+                date={r.displayDate}
+                status={mapRequestStatusToBadge(r.status)}
                 priority={r.priority}
-                payNow={r.status === 'flag'}
+                payNow={r.paymentRequired}
                 onPress={() => router.push(`/request/${r.id}`)}
                 onMorePress={() => {}}
                 onPayPress={() => router.push(`/request/${r.id}`)}
