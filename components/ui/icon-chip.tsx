@@ -1,7 +1,7 @@
-import { cn } from '@/lib/utils';
-import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { View } from 'react-native';
+import { useColorScheme } from 'nativewind';
+import { cn } from '@/lib/utils';
 
 export type IconChipTone = 'brand' | 'amber' | 'slate' | 'blue' | 'red';
 
@@ -40,8 +40,8 @@ export function IconChip({ tone = 'brand', size = 'md', className, children, ...
   const { colorScheme } = useColorScheme();
   const color = iconColor[tone][colorScheme ?? 'light'];
 
-  // Inject the tone colour into the child icon unless the caller already set one.
-  const tinted = React.Children.map(children, (child) => {
+  // Children are expected to be lucide icons (components that accept a color prop). Inject the tone colour unless the caller already set one explicitly.
+  const childrenWithColor = React.Children.map(children, (child) => {
     if (!React.isValidElement(child)) return child;
     const props = child.props as { color?: string };
     if (props.color != null) return child;
@@ -58,7 +58,7 @@ export function IconChip({ tone = 'brand', size = 'md', className, children, ...
       )}
       {...props}
     >
-      {tinted}
+      {childrenWithColor}
     </View>
   );
 }
