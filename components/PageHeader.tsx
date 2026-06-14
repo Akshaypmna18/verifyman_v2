@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Bell, ChevronLeft } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from './ui/text';
@@ -14,13 +15,15 @@ function NotificationBell({
   count?: number;
   onPress?: () => void;
 }) {
+  const { colorScheme } = useColorScheme();
+  const mutedColor = colorScheme === 'dark' ? 'hsl(215 16% 55%)' : 'hsl(215 16% 47%)';
   return (
     <Pressable
       onPress={onPress}
       className="w-10 h-10 rounded-full bg-secondary border border-border items-center justify-center active:opacity-70"
       aria-label="Notifications"
     >
-      <Bell size={18} strokeWidth={2} className="text-muted-foreground" />
+      <Bell size={18} strokeWidth={2} color={mutedColor} />
       {count > 0 && (
         <View className="absolute top-1 right-1 min-w-[14px] h-[14px] rounded-full bg-destructive items-center justify-center px-0.5">
           <Text className="text-[8px] font-black text-white leading-none">
@@ -104,6 +107,8 @@ type BackHeaderProps = {
 };
 
 export function BackHeader({ title, onBack, right, className }: BackHeaderProps) {
+  const { colorScheme } = useColorScheme();
+  const fgColor = colorScheme === 'dark' ? 'hsl(210 40% 98%)' : 'hsl(222 47% 11%)';
   return (
     <SafeAreaView edges={['top']} className={cn('bg-card border-b border-border', className)}>
       <View className="flex-row items-center justify-between px-4 h-14">
@@ -113,7 +118,7 @@ export function BackHeader({ title, onBack, right, className }: BackHeaderProps)
             className="w-10 h-10 rounded-full bg-secondary border border-border items-center justify-center active:opacity-70"
             aria-label="Go back"
           >
-            <ChevronLeft size={20} strokeWidth={2.4} className="text-foreground" />
+            <ChevronLeft size={20} strokeWidth={2.4} color={fgColor} />
           </Pressable>
           <Text
             className="text-[17px] font-black text-foreground flex-1"

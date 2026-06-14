@@ -4,17 +4,28 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { NAV_THEME, THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
-import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
+import { useEffect } from 'react';
+import { Appearance } from 'react-native';
 
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
 
 export default function RootLayout() {
-  const { colorScheme } = useColorScheme();
+  const { colorScheme, setColorScheme } = useColorScheme();
+
+  useEffect(() => {
+    const toScheme = (s: string | null | undefined) =>
+      s === 'dark' ? 'dark' : 'light';
+    setColorScheme(toScheme(Appearance.getColorScheme()));
+    const sub = Appearance.addChangeListener(({ colorScheme: next }) => {
+      setColorScheme(toScheme(next));
+    });
+    return () => sub.remove();
+  }, []);
+
   const primaryColor = THEME[colorScheme ?? 'light'].primary;
   const tabBarColor = THEME[colorScheme ?? 'light'].card;
 

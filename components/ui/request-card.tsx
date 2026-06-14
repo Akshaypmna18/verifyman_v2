@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Calendar, Clock, MapPin, MoreHorizontal } from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { Pressable, TouchableOpacity, View } from 'react-native';
 import type { BadgeStatus } from './status-badge';
 import { StatusBadge } from './status-badge';
@@ -35,6 +36,9 @@ export function RequestCard({
   onPayPress,
   className,
 }: RequestCardProps) {
+  const { colorScheme } = useColorScheme();
+  const iconMuted = colorScheme === 'dark' ? 'hsl(215 16% 55%)' : 'hsl(215 16% 60%)';
+  const iconPrimary = 'hsl(143 82% 36%)';
   return (
     <Pressable
       onPress={onPress}
@@ -64,12 +68,12 @@ export function RequestCard({
       {/* Meta row: service + date */}
       <View className="flex-row items-center gap-5 mt-3 mb-3.5">
         <View className="flex-row items-center gap-1.5">
-          <ServiceIcon size={16} strokeWidth={2} className="text-primary" />
+          <ServiceIcon size={16} strokeWidth={2} color={iconPrimary} />
           <Text className="text-[13.5px] font-semibold text-muted-foreground">{service}</Text>
         </View>
         {date && (
           <View className="flex-row items-center gap-1.5">
-            <Calendar size={15} strokeWidth={2} className="text-muted-foreground/60" />
+            <Calendar size={15} strokeWidth={2} color={iconMuted} />
             <Text className="text-[13.5px] font-semibold text-muted-foreground">{date}</Text>
           </View>
         )}
@@ -87,7 +91,7 @@ export function RequestCard({
           </TouchableOpacity>
         ) : (
           <View className="flex-row items-center gap-1.5">
-            <Clock size={14} strokeWidth={2} className="text-muted-foreground/60" />
+            <Clock size={14} strokeWidth={2} color={iconMuted} />
             <Text className="text-[13px] font-semibold text-muted-foreground">{priority}</Text>
           </View>
         )}
@@ -96,7 +100,7 @@ export function RequestCard({
           activeOpacity={0.7}
           className="w-8 h-8 items-center justify-center"
         >
-          <MoreHorizontal size={20} className="text-muted-foreground" />
+          <MoreHorizontal size={20} color={iconMuted} />
         </TouchableOpacity>
       </View>
     </Pressable>
