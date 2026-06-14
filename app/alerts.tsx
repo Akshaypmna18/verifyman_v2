@@ -1,10 +1,9 @@
-import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/screen';
 import { AlertRow } from '@/components/ui/alert-row';
 import type { IconChipTone } from '@/components/ui/icon-chip';
 import { StickySubHeader } from '@/components/ui/sticky-sub-header';
 import { Text } from '@/components/ui/text';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import type { LucideIcon } from 'lucide-react-native';
 import {
   AlertTriangle,
@@ -194,28 +193,21 @@ export default function AlertsPage() {
 
   return (
     <>
-      <PageHeader
-        userInitials="JP"
-        notificationCount={unreadCount}
-        onProfilePress={() => router.push('/profile')}
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: 'Alerts',
+          headerBackTitle: 'Back',
+          headerRight: () =>
+            unreadCount > 0 ? (
+              <Pressable onPress={markAllRead} hitSlop={8}>
+                <Text className="text-[13px] font-bold text-primary">
+                  Mark all read
+                </Text>
+              </Pressable>
+            ) : null,
+        }}
       />
-
-      {/* Sub-header */}
-      <StickySubHeader className="py-2.5 flex-row items-center justify-between">
-        <Text
-          className="text-[17px] font-extrabold text-foreground"
-          style={{ letterSpacing: -0.3 }}
-        >
-          Alerts
-        </Text>
-        {unreadCount > 0 && (
-          <Pressable onPress={markAllRead} hitSlop={8}>
-            <Text className="text-[13px] font-bold text-primary">
-              Mark all as read
-            </Text>
-          </Pressable>
-        )}
-      </StickySubHeader>
 
       <Screen scrollable contentClassName="px-0 py-3 gap-0">
         <GroupSection title="Today" items={today} onItemPress={openAlert} />

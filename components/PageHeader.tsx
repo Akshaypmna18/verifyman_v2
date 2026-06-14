@@ -84,13 +84,12 @@ export function PageHeader({
   return (
     <SafeAreaView edges={['top']} className={cn('bg-card border-b border-border', className)}>
       <View className="flex-row items-center justify-between px-4 h-14">
-        <VLogo size={20} />
+        <VLogo size={30} />
 
         {center && <View className="flex-1 mx-3">{center}</View>}
 
         <View className="flex-row items-center gap-2">
           <NotificationBell count={notificationCount} onPress={onNotificationPress} />
-          <AvatarButton initials={userInitials} onPress={onProfilePress} />
         </View>
       </View>
     </SafeAreaView>
