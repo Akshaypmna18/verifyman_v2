@@ -1,11 +1,11 @@
 import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/screen';
-import { IconChip } from '@/components/ui/icon-chip';
 import type { IconChipTone } from '@/components/ui/icon-chip';
+import { ServiceCard } from '@/components/ui/service-card';
 import { Text } from '@/components/ui/text';
+import { useRouter } from 'expo-router';
 import type { LucideIcon } from 'lucide-react-native';
 import {
-  ArrowRight,
   Briefcase,
   ClipboardList,
   GraduationCap,
@@ -13,7 +13,7 @@ import {
   Scale,
   ShieldCheck,
 } from 'lucide-react-native';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -77,52 +77,11 @@ const SERVICES: Service[] = [
   },
 ];
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function ServiceCard({ service }: { service: Service }) {
-  return (
-    <Pressable
-      className="flex-1 bg-card border border-border rounded-[20px] p-4 gap-3 active:bg-secondary shadow-sm shadow-black/5"
-      style={{ minWidth: 148 }}
-    >
-      <IconChip tone={service.tone} size="lg">
-        <service.icon size={22} strokeWidth={2} />
-      </IconChip>
-
-      <View className="gap-1 flex-1">
-        <Text
-          className="text-[15px] font-extrabold text-foreground"
-          style={{ letterSpacing: -0.2, lineHeight: 20 }}
-        >
-          {service.name}
-        </Text>
-        <Text className="text-[12px] font-medium text-muted-foreground leading-[16px]">
-          {service.description}
-        </Text>
-      </View>
-
-      <View className="gap-1.5">
-        <View className="flex-row items-center gap-1">
-          <Text className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground/70">
-            Turnaround
-          </Text>
-          <Text className="text-[10px] font-bold text-primary">
-            {service.turnaround}
-          </Text>
-        </View>
-
-        <View className="flex-row items-center gap-1">
-          <Text className="text-[13px] font-bold text-primary">Request</Text>
-          <ArrowRight size={13} strokeWidth={2.5} className="text-primary" />
-        </View>
-      </View>
-    </Pressable>
-  );
-}
-
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ServicesPage() {
+  const router = useRouter();
+
   // Split into rows of 2
   const rows: Service[][] = [];
   for (let i = 0; i < SERVICES.length; i += 2) {
@@ -131,7 +90,7 @@ export default function ServicesPage() {
 
   return (
     <>
-      <PageHeader userInitials="JP" onProfilePress={() => {}} />
+      <PageHeader userInitials="JP" onProfilePress={() => router.push('/profile')} />
       <Screen scrollable contentClassName="px-4 py-5 gap-5">
         {/* Hero */}
         <View className="gap-1">
@@ -151,7 +110,15 @@ export default function ServicesPage() {
           {rows.map((row, ri) => (
             <View key={ri} className="flex-row gap-3">
               {row.map((s) => (
-                <ServiceCard key={s.id} service={s} />
+                <ServiceCard
+                  key={s.id}
+                  name={s.name}
+                  description={s.description}
+                  icon={s.icon}
+                  tone={s.tone}
+                  turnaround={s.turnaround}
+                  onPress={() => router.push(`/new-request?service=${s.id}`)}
+                />
               ))}
               {/* Odd row: fill empty column */}
               {row.length === 1 && <View className="flex-1" style={{ minWidth: 148 }} />}

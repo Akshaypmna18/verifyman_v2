@@ -1,8 +1,12 @@
 import { cn } from '@/lib/utils';
 import { AlertTriangle, Check, Clock, RefreshCw } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, View } from 'react-native';
 import { Text } from './text';
+
+// Running spin-icon colour, matched to STATUS_CONFIG.running.textClass.
+const RUNNING_ICON_COLOR = { light: 'hsl(32, 85%, 32%)', dark: 'hsl(43, 96%, 56%)' } as const;
 
 export type BadgeStatus = 'running' | 'unknown' | 'done' | 'flag';
 
@@ -66,6 +70,7 @@ function SpinIcon({ Icon, color }: { Icon: typeof RefreshCw; color: string }) {
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
+  const { colorScheme } = useColorScheme();
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.unknown;
 
   return (
@@ -77,7 +82,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       )}
     >
       {config.spin ? (
-        <SpinIcon Icon={config.Icon} color="hsl(32, 85%, 32%)" />
+        <SpinIcon Icon={config.Icon} color={RUNNING_ICON_COLOR[colorScheme ?? 'light']} />
       ) : (
         <config.Icon size={11} strokeWidth={2.6} />
       )}

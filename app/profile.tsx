@@ -1,10 +1,10 @@
 import { Screen } from '@/components/screen';
-import { IconChip } from '@/components/ui/icon-chip';
+import { ListRow } from '@/components/ui/list-row';
 import { Text } from '@/components/ui/text';
+import { useRouter } from 'expo-router';
 import {
   Bell,
   Building2,
-  ChevronRight,
   CreditCard,
   FileText,
   HelpCircle,
@@ -18,6 +18,7 @@ import type { LucideIcon } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { IconChipTone } from '@/components/ui/icon-chip';
+import type { Href } from 'expo-router';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ type SettingsItem = {
   label: string;
   tone: IconChipTone;
   value?: string;
-  destructive?: boolean;
+  route?: Href;
 };
 
 type SettingsSection = {
@@ -77,28 +78,11 @@ const SETTINGS_SECTIONS: SettingsSection[] = [
   },
 ];
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function SettingsRow({ item }: { item: SettingsItem }) {
-  return (
-    <Pressable className="flex-row items-center px-4 py-3.5 active:bg-secondary">
-      <IconChip tone={item.tone} size="sm" className="mr-3 flex-none">
-        <item.icon size={15} strokeWidth={2.2} />
-      </IconChip>
-      <Text className="flex-1 text-[15px] font-semibold text-foreground">
-        {item.label}
-      </Text>
-      {item.value && (
-        <Text className="text-[13px] font-bold text-primary mr-2">{item.value}</Text>
-      )}
-      <ChevronRight size={16} strokeWidth={2} className="text-muted-foreground" />
-    </Pressable>
-  );
-}
-
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
+  const router = useRouter();
+
   return (
     <Screen scrollable contentClassName="px-0 py-0">
       {/* Hero — full-bleed top band */}
@@ -184,7 +168,13 @@ export default function ProfilePage() {
             <View className="bg-card border border-border rounded-2xl overflow-hidden">
               {section.items.map((item, idx) => (
                 <View key={item.label}>
-                  <SettingsRow item={item} />
+                  <ListRow
+                    icon={item.icon}
+                    label={item.label}
+                    tone={item.tone}
+                    value={item.value}
+                    onPress={() => router.push(item.route ?? '/settings')}
+                  />
                   {idx < section.items.length - 1 && (
                     <View className="h-px bg-border mx-4" />
                   )}

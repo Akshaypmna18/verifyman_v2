@@ -1,17 +1,21 @@
 import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/screen';
+import { EmptyState } from '@/components/ui/empty-state';
 import { FAB } from '@/components/ui/fab';
 import { RequestCard } from '@/components/ui/request-card';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { StickySubHeader } from '@/components/ui/sticky-sub-header';
 import { Text } from '@/components/ui/text';
 import type { BadgeStatus } from '@/components/ui/status-badge';
+import { useRouter } from 'expo-router';
 import {
   Briefcase,
+  ClipboardList,
   GraduationCap,
   MapPin,
   Scale,
+  SearchX,
   ShieldCheck,
-  ClipboardList,
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -136,6 +140,7 @@ const TABS = [
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function RequestsPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<TabId>('all');
 
   const filtered = ALL_REQUESTS.filter((r) => {
@@ -146,20 +151,20 @@ export default function RequestsPage() {
 
   return (
     <>
-      <PageHeader userInitials="JP" onProfilePress={() => {}} />
+      <PageHeader userInitials="JP" onProfilePress={() => router.push('/profile')} />
 
       {/* Segmented control pinned below header */}
-      <View className="bg-card border-b border-border px-4 py-3">
+      <StickySubHeader>
         <SegmentedControl options={TABS} value={tab} onChange={setTab} />
-      </View>
+      </StickySubHeader>
 
       <Screen scrollable contentClassName="px-4 py-4 gap-3">
         {filtered.length === 0 ? (
-          <View className="flex-1 items-center justify-center py-20 gap-3">
-            <Text className="text-[15px] font-semibold text-muted-foreground text-center">
-              No {tab === 'flag' ? 'flagged' : tab} verifications found.
-            </Text>
-          </View>
+          <EmptyState
+            icon={SearchX}
+            title="Nothing here yet"
+            description={`No ${tab === 'flag' ? 'flagged' : tab} verifications found.`}
+          />
         ) : (
           <>
             <Text className="text-[12px] font-bold tracking-widest uppercase text-muted-foreground mb-1">
@@ -176,9 +181,9 @@ export default function RequestsPage() {
                 status={r.status}
                 priority={r.priority}
                 payNow={r.payNow}
-                onPress={() => {}}
+                onPress={() => router.push(`/request/${r.id}`)}
                 onMorePress={() => {}}
-                onPayPress={() => {}}
+                onPayPress={() => router.push(`/request/${r.id}`)}
               />
             ))}
             <View className="h-10" />
@@ -186,7 +191,7 @@ export default function RequestsPage() {
         )}
       </Screen>
 
-      <FAB onPress={() => {}} />
+      <FAB onPress={() => router.push('/new-request')} />
     </>
   );
 }

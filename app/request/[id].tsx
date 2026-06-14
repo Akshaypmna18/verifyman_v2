@@ -1,21 +1,22 @@
 import { BackHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/screen';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useRouter } from 'expo-router';
 import { FileText } from 'lucide-react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
-export default function ReportsPage() {
+export default function RequestDetailPage() {
   const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
 
   return (
     <>
-      <BackHeader title="Reports" onBack={() => router.back()} />
+      <BackHeader title={id ? `Request ${id}` : 'Request'} onBack={() => router.back()} />
       <Screen scrollable contentClassName="px-4 py-5">
         <EmptyState
           icon={FileText}
           tone="blue"
           title="Coming soon"
-          description="Full report viewer with check-by-check breakdown will be available here."
+          description="The full check-by-check verification breakdown will be available here."
         />
       </Screen>
     </>

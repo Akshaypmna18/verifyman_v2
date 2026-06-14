@@ -1,8 +1,10 @@
 import { PageHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/screen';
-import { IconChip } from '@/components/ui/icon-chip';
+import { AlertRow } from '@/components/ui/alert-row';
 import type { IconChipTone } from '@/components/ui/icon-chip';
+import { StickySubHeader } from '@/components/ui/sticky-sub-header';
 import { Text } from '@/components/ui/text';
+import { useRouter } from 'expo-router';
 import type { LucideIcon } from 'lucide-react-native';
 import {
   AlertTriangle,
@@ -13,7 +15,6 @@ import {
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { cn } from '@/lib/utils';
 
 // ─── Types & data ────────────────────────────────────────────────────────────
 
@@ -126,56 +127,14 @@ const ALERTS: AlertItem[] = [
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function AlertRow({ item }: { item: AlertItem }) {
-  const config = TYPE_CONFIG[item.type];
-
-  return (
-    <Pressable
-      className={cn(
-        'flex-row items-start gap-3 px-4 py-3.5 active:bg-secondary',
-        item.unread && 'bg-accent/40'
-      )}
-    >
-      <IconChip tone={config.tone} size="sm" className="mt-0.5 flex-none">
-        <config.icon size={14} strokeWidth={2.2} />
-      </IconChip>
-
-      <View className="flex-1 gap-0.5">
-        <View className="flex-row items-start justify-between gap-2">
-          <Text
-            className={cn(
-              'flex-1 text-[13.5px] text-foreground leading-[18px]',
-              item.unread ? 'font-extrabold' : 'font-semibold'
-            )}
-            numberOfLines={2}
-          >
-            {item.title}
-          </Text>
-          <Text className="text-[11px] font-semibold text-muted-foreground flex-none mt-0.5">
-            {item.time}
-          </Text>
-        </View>
-        <Text
-          className="text-[12.5px] font-medium text-muted-foreground leading-[17px]"
-          numberOfLines={2}
-        >
-          {item.body}
-        </Text>
-      </View>
-
-      {item.unread && (
-        <View className="w-2 h-2 rounded-full bg-primary mt-1 flex-none" />
-      )}
-    </Pressable>
-  );
-}
-
 function GroupSection({
   title,
   items,
+  onItemPress,
 }: {
   title: string;
   items: AlertItem[];
+  onItemPress: (item: AlertItem) => void;
 }) {
   if (items.length === 0) return null;
 
@@ -190,14 +149,23 @@ function GroupSection({
 
       {/* Alert rows with hairline dividers */}
       <View className="bg-card border border-border rounded-2xl overflow-hidden">
-        {items.map((item, idx) => (
-          <View key={item.id}>
-            <AlertRow item={item} />
-            {idx < items.length - 1 && (
-              <View className="h-px bg-border mx-4" />
-            )}
-          </View>
-        ))}
+        {items.map((item, idx) => {
+          const config = TYPE_CONFIG[item.type];
+          return (
+            <View key={item.id}>
+              <AlertRow
+                icon={config.icon}
+                tone={config.tone}
+                title={item.title}
+                body={item.body}
+                time={item.time}
+                unread={item.unread}
+                onPress={() => onItemPress(item)}
+              />
+              {idx < items.length - 1 && <View className="h-px bg-border mx-4" />}
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -206,9 +174,10 @@ function GroupSection({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function AlertsPage() {
-  const unreadCount = ALERTS.filter((a) => a.unread).length;
+  const router = useRouter();
   const [alerts, setAlerts] = useState(ALERTS);
 
+  const unreadCount = alerts.filter((a) => a.unread).length;
   const today     = alerts.filter((a) => a.group === 'today');
   const yesterday = alerts.filter((a) => a.group === 'yesterday');
   const earlier   = alerts.filter((a) => a.group === 'earlier');
@@ -217,16 +186,22 @@ export default function AlertsPage() {
     setAlerts((prev) => prev.map((a) => ({ ...a, unread: false })));
   }
 
+  function openAlert(item: AlertItem) {
+    setAlerts((prev) => prev.map((a) => (a.id === item.id ? { ...a, unread: false } : a)));
+    if (item.type === 'payment') router.push('/new-request');
+    else router.push('/reports');
+  }
+
   return (
     <>
       <PageHeader
         userInitials="JP"
         notificationCount={unreadCount}
-        onProfilePress={() => {}}
+        onProfilePress={() => router.push('/profile')}
       />
 
       {/* Sub-header */}
-      <View className="bg-card border-b border-border px-4 py-2.5 flex-row items-center justify-between">
+      <StickySubHeader className="py-2.5 flex-row items-center justify-between">
         <Text
           className="text-[17px] font-extrabold text-foreground"
           style={{ letterSpacing: -0.3 }}
@@ -240,12 +215,12 @@ export default function AlertsPage() {
             </Text>
           </Pressable>
         )}
-      </View>
+      </StickySubHeader>
 
       <Screen scrollable contentClassName="px-0 py-3 gap-0">
-        <GroupSection title="Today" items={today} />
-        <GroupSection title="Yesterday" items={yesterday} />
-        <GroupSection title="Earlier" items={earlier} />
+        <GroupSection title="Today" items={today} onItemPress={openAlert} />
+        <GroupSection title="Yesterday" items={yesterday} onItemPress={openAlert} />
+        <GroupSection title="Earlier" items={earlier} onItemPress={openAlert} />
         <View className="h-4" />
       </Screen>
     </>

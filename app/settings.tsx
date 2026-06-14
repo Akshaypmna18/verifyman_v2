@@ -1,21 +1,22 @@
 import { BackHeader } from '@/components/PageHeader';
 import { Screen } from '@/components/screen';
-import { Text } from '@/components/ui/text';
-import { View } from 'react-native';
+import { EmptyState } from '@/components/ui/empty-state';
+import { useRouter } from 'expo-router';
+import { Settings } from 'lucide-react-native';
 
 export default function SettingsPage() {
+  const router = useRouter();
+
   return (
     <>
-      <BackHeader title="Settings" onBack={() => {}} />
+      <BackHeader title="Settings" onBack={() => router.back()} />
       <Screen scrollable contentClassName="px-4 py-5">
-        <View className="flex-1 items-center justify-center py-20 gap-2">
-          <Text className="text-[17px] font-extrabold text-foreground" style={{ letterSpacing: -0.3 }}>
-            Coming soon
-          </Text>
-          <Text className="text-[14px] font-medium text-muted-foreground text-center">
-            App preferences, theme and notification settings will be available here.
-          </Text>
-        </View>
+        <EmptyState
+          icon={Settings}
+          tone="slate"
+          title="Coming soon"
+          description="App preferences, theme and notification settings will be available here."
+        />
       </Screen>
     </>
   );

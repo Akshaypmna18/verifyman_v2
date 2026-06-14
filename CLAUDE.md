@@ -43,23 +43,31 @@ verifyman/
 │   ├── services.tsx       # Verification services catalogue
 │   ├── alerts.tsx         # Notifications / alerts feed
 │   ├── profile.tsx        # User profile + settings
-│   ├── reports.tsx        # Reports viewer (future)
-│   └── settings.tsx       # App settings (future)
+│   ├── reports.tsx        # Reports viewer (stub — Coming soon)
+│   ├── settings.tsx       # App settings (stub — Coming soon)
+│   ├── new-request.tsx    # New verification wizard (stub — Coming soon, reads ?service=)
+│   └── request/[id].tsx   # Request detail (stub — Coming soon)
 ├── components/
 │   ├── PageHeader.tsx     # Top nav bar (logo + bell + avatar) — also exports BackHeader
 │   ├── screen.tsx         # Screen wrapper (safe area + optional scroll)
 │   └── ui/
+│       ├── alert-row.tsx      # Notification feed row (icon + title + body + time)
 │       ├── button.tsx         # CVA button with variants
 │       ├── card.tsx           # Card / CardHeader / CardContent / CardFooter
+│       ├── empty-state.tsx    # Centered icon + title + description (empty/coming-soon)
 │       ├── fab.tsx            # Floating Action Button
 │       ├── icon-chip.tsx      # Rounded icon container with tone colours
 │       ├── icon.tsx           # (thin wrapper if needed)
+│       ├── list-row.tsx       # Settings/menu row (icon-chip + label + value + chevron)
 │       ├── request-card.tsx   # Candidate verification card
+│       ├── section-header.tsx # Section title + optional action link
 │       ├── segmented-control.tsx  # Pill tab switcher
+│       ├── service-card.tsx   # Service catalogue grid card
 │       ├── stat-card.tsx      # KPI metric tile
 │       ├── status-badge.tsx   # running / done / flag / unknown pill
+│       ├── sticky-sub-header.tsx  # Card-coloured bar pinned below PageHeader
 │       ├── text.tsx           # Text with TextClassContext
-│       └── v-logo.tsx         # Verifyman wordmark SVG
+│       └── v-logo.tsx         # Verifyman wordmark — real SVG assets, theme-swapped
 ├── lib/
 │   ├── theme.ts           # THEME + NAV_THEME (colour tokens as JS)
 │   └── utils.ts           # cn() helper (clsx + twMerge)
@@ -243,6 +251,75 @@ Rounded icon container. Sizes: `sm` (32px), `md` (38px), `lg` (52px).
   <Briefcase size={24} strokeWidth={2} />
 </IconChip>
 ```
+
+---
+
+### `<SectionHeader />` — `components/ui/section-header.tsx`
+
+Section title + optional right-aligned action link. Use above any list/grid block.
+
+```tsx
+<SectionHeader title="Recent Verifications" action="View all" onAction={() => router.push('/requests')} />
+```
+
+---
+
+### `<ListRow />` — `components/ui/list-row.tsx`
+
+Settings / menu row: icon-chip + label + optional trailing value + chevron.
+
+```tsx
+<ListRow icon={Bell} label="Notifications" tone="blue" value="Pro" onPress={() => router.push('/settings')} />
+```
+
+---
+
+### `<ServiceCard />` — `components/ui/service-card.tsx`
+
+Service catalogue grid card. Use 2-up in a `flex-row gap-3` row.
+
+```tsx
+<ServiceCard name="Identity\nVerification" description="Aadhaar, PAN…" icon={ShieldCheck}
+  tone="brand" turnaround="< 1 min" onPress={() => router.push('/new-request?service=identity')} />
+```
+
+---
+
+### `<AlertRow />` — `components/ui/alert-row.tsx`
+
+Notification feed row. Caller resolves icon/tone (e.g. from a TYPE_CONFIG map) and passes them in.
+
+```tsx
+<AlertRow icon={CheckCircle} tone="brand" title="Report ready" body="…" time="9:14 AM" unread onPress={…} />
+```
+
+---
+
+### `<EmptyState />` — `components/ui/empty-state.tsx`
+
+Centered icon + title + description. Use for empty lists and "Coming soon" stubs.
+
+```tsx
+<EmptyState icon={SearchX} title="Nothing here yet" description="No flagged verifications found." />
+```
+
+---
+
+### `<StickySubHeader />` — `components/ui/sticky-sub-header.tsx`
+
+Card-coloured bar pinned directly below `<PageHeader>` (segmented control, title + action). Default padding `px-4 py-3` — override via `className`.
+
+```tsx
+<StickySubHeader>
+  <SegmentedControl options={TABS} value={tab} onChange={setTab} />
+</StickySubHeader>
+```
+
+---
+
+### `<VLogo />` — `components/ui/v-logo.tsx`
+
+Verifyman wordmark. Renders the real SVG markup via `SvgCss` (from `react-native-svg/css`, which honours the `<style>`/class fills), auto-swapped by colour scheme via `useColorScheme()`. `size` = height in px; width derived from aspect ratio. Raw SVG strings live in `components/ui/logo-data.ts` (auto-generated from `assets/images/verifyman_*_logo.svg` — regenerate if the source art changes). No metro/transformer config needed.
 
 ---
 
@@ -437,14 +514,21 @@ Until the backend is connected, use realistic Indian names, company names, and I
 
 ---
 
-## Future screens (not yet implemented)
+## Routes (stubbed — "Coming soon", nav wired, content pending)
+
+These exist as stack routes (not tabs) so navigation resolves end-to-end. Build out the real content next.
 
 | Route | Purpose |
 |---|---|
 | `app/reports.tsx` | Full report viewer with check-by-check breakdown |
 | `app/settings.tsx` | App preferences (theme, notifications, language) |
-| `app/new-request.tsx` | Wizard to submit a new candidate for verification |
+| `app/new-request.tsx` | Wizard to submit a new candidate (reads `?service=` param) |
 | `app/request/[id].tsx` | Detail view for a single verification request |
+
+## Future screens (not yet implemented)
+
+| Route | Purpose |
+|---|---|
 | `app/(auth)/signin.tsx` | Login / sign-up flow |
 
 ---
@@ -460,4 +544,190 @@ pnpm android      # Android emulator
 Adding new reusable components:
 ```bash
 npx react-native-reusables/cli@latest add input textarea
+```
+
+---
+
+## Git workflow
+
+We use **GitHub Flow** — simple, branch-based, works perfectly for a small mobile team.
+
+### The one rule
+
+> **Never commit directly to `main`.** Every change — no matter how small — goes through a branch and a PR.
+
+`main` is always deployable. It maps to what goes to the App Store / Play Store.
+
+---
+
+### Branch types and naming
+
+```
+feat/short-description       # new screen, feature, or component
+fix/short-description        # bug fix
+chore/short-description      # deps, config, tooling — no user-facing change
+hotfix/short-description     # emergency fix that needs to ship immediately
+docs/short-description       # documentation only (e.g. CLAUDE.md updates)
+```
+
+**Examples:**
+```
+feat/request-detail-screen
+feat/new-request-wizard
+fix/status-badge-dark-mode
+fix/profile-avatar-overflow
+chore/upgrade-expo-55
+hotfix/crash-on-android-startup
+docs/add-api-integration-notes
+```
+
+**Rules:**
+- All lowercase, hyphens only — no slashes inside the name, no spaces
+- Keep it short but descriptive (3–5 words max after the prefix)
+- One concern per branch — don't mix a fix and a new feature
+
+---
+
+### Starting a new branch
+
+Always branch off the latest `main`:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/your-feature-name
+```
+
+Or use the helper script:
+
+```bash
+./scripts/new-branch.sh feat/request-detail-screen
+```
+
+---
+
+### Commit messages — Conventional Commits
+
+Format: `type(scope): short description`
+
+| Type | When to use |
+|---|---|
+| `feat` | New screen, component, or user-facing behaviour |
+| `fix` | Bug fix |
+| `chore` | Deps, config, build scripts |
+| `docs` | CLAUDE.md or other docs only |
+| `style` | Formatting/whitespace, no logic change |
+| `refactor` | Restructure without behaviour change |
+| `hotfix` | Emergency production fix |
+
+**Good examples:**
+```
+feat(home): add quick-action chips for each service type
+fix(request-card): status badge overflows on long names
+chore: upgrade expo to 55.1.0
+docs: document IconChip tone colour system in CLAUDE.md
+refactor(screen): extract SectionHeader into shared component
+hotfix(android): fix crash on startup when notifications disabled
+```
+
+**Rules:**
+- Lowercase, present tense ("add" not "added")
+- No period at end
+- Keep the subject under 72 characters
+- Add a blank line + body paragraph for anything non-obvious
+
+---
+
+### Opening a PR
+
+1. Push your branch: `git push origin feat/your-feature-name`
+2. Open a PR on GitHub targeting `main`
+3. Fill in the PR template (`.github/PULL_REQUEST_TEMPLATE.md`)
+4. Self-review your diff before requesting a review
+5. Merge with **Squash and merge** — keeps `main` history linear
+
+**PR title** follows the same Conventional Commits format:
+```
+feat(services): add 2-column service grid with turnaround times
+```
+
+---
+
+### Merge strategy
+
+| Situation | Strategy |
+|---|---|
+| Regular feature / fix | Squash and merge → linear main history |
+| Long-running feature with meaningful sub-commits | Merge commit (discuss first) |
+| Hotfix | Squash and merge, tag immediately after |
+
+---
+
+### Releases and version tags
+
+When a build is ready to submit to App Store / Play Store:
+
+```bash
+git checkout main
+git pull origin main
+git tag v1.0.0 -m "Release v1.0.0 — initial launch"
+git push origin v1.0.0
+```
+
+Versioning follows **semver** (`MAJOR.MINOR.PATCH`):
+- `PATCH` — bug fixes only (`v1.0.1`)
+- `MINOR` — new features, backward compatible (`v1.1.0`)
+- `MAJOR` — breaking changes or major redesigns (`v2.0.0`)
+
+Also bump `version` in `app.json` and the iOS/Android build numbers before tagging.
+
+---
+
+### Hotfix flow
+
+If something is broken on `main` in production:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-crash-description
+# fix the issue
+git commit -m "hotfix: fix crash when notification badge is null"
+# open PR → squash merge → tag immediately
+git tag v1.0.1 -m "Hotfix v1.0.1"
+git push origin v1.0.1
+```
+
+---
+
+### GitHub branch protection (set this up on GitHub.com)
+
+Go to **Settings → Branches → Add rule** for `main`:
+
+- ✅ Require a pull request before merging
+- ✅ Require approvals: 1 (even if it's just yourself reviewing)
+- ✅ Dismiss stale pull request approvals when new commits are pushed
+- ✅ Require status checks to pass before merging (add TypeScript check when CI is set up)
+- ✅ Do not allow bypassing the above settings
+- ✅ Restrict who can push to matching branches (only you / leads)
+
+---
+
+### Quick reference cheat sheet
+
+```bash
+# Start work
+git checkout main && git pull origin main
+git checkout -b feat/your-feature
+
+# During work
+git add -p                          # stage hunks, not whole files
+git commit -m "feat(scope): desc"
+
+# Before PR
+git fetch origin
+git rebase origin/main              # keep branch up to date
+
+# Done — push and open PR
+git push origin feat/your-feature
 ```

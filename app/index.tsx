@@ -3,8 +3,10 @@ import { Screen } from '@/components/screen';
 import { FAB } from '@/components/ui/fab';
 import { IconChip } from '@/components/ui/icon-chip';
 import { RequestCard } from '@/components/ui/request-card';
+import { SectionHeader } from '@/components/ui/section-header';
 import { StatCard } from '@/components/ui/stat-card';
 import { Text } from '@/components/ui/text';
+import { useRouter } from 'expo-router';
 import {
   Briefcase,
   CheckCircle,
@@ -61,47 +63,22 @@ const RECENT_REQUESTS = [
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function SectionHeader({
-  title,
-  action,
-  onAction,
-}: {
-  title: string;
-  action?: string;
-  onAction?: () => void;
-}) {
-  return (
-    <View className="flex-row items-center justify-between mb-3">
-      <Text
-        className="text-[17px] font-extrabold text-foreground"
-        style={{ letterSpacing: -0.3 }}
-      >
-        {title}
-      </Text>
-      {action && (
-        <Pressable onPress={onAction} hitSlop={8}>
-          <Text className="text-[13px] font-bold text-primary">{action}</Text>
-        </Pressable>
-      )}
-    </View>
-  );
-}
+const QUICK_ACTIONS = [
+  { id: 'identity', label: 'Identity', icon: ShieldCheck, tone: 'brand' as const },
+  { id: 'employment', label: 'Employment', icon: Briefcase, tone: 'blue' as const },
+  { id: 'education', label: 'Education', icon: GraduationCap, tone: 'amber' as const },
+  { id: 'address', label: 'Address', icon: MapPin, tone: 'slate' as const },
+];
 
-function QuickActions() {
-  const actions = [
-    { label: 'Identity', icon: ShieldCheck, tone: 'brand' as const },
-    { label: 'Employment', icon: Briefcase, tone: 'blue' as const },
-    { label: 'Education', icon: GraduationCap, tone: 'amber' as const },
-    { label: 'Address', icon: MapPin, tone: 'slate' as const },
-  ];
-
+function QuickActions({ onSelect }: { onSelect: (id: string) => void }) {
   return (
     <View>
       <SectionHeader title="Quick Request" />
       <View className="flex-row justify-between gap-2">
-        {actions.map((a) => (
+        {QUICK_ACTIONS.map((a) => (
           <Pressable
-            key={a.label}
+            key={a.id}
+            onPress={() => onSelect(a.id)}
             className="flex-1 items-center gap-2 py-3 rounded-2xl bg-card border border-border active:bg-secondary"
           >
             <IconChip tone={a.tone} size="md">
@@ -120,13 +97,15 @@ function QuickActions() {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const router = useRouter();
+
   return (
     <>
       <PageHeader
         userInitials="JP"
         notificationCount={3}
-        onNotificationPress={() => {}}
-        onProfilePress={() => {}}
+        onNotificationPress={() => router.push('/alerts')}
+        onProfilePress={() => router.push('/profile')}
       />
       <Screen scrollable contentClassName="px-4 py-5 gap-5">
         {/* Greeting */}
@@ -161,11 +140,15 @@ export default function HomePage() {
         </View>
 
         {/* Quick actions */}
-        <QuickActions />
+        <QuickActions onSelect={(id) => router.push(`/new-request?service=${id}`)} />
 
         {/* Recent verifications */}
         <View>
-          <SectionHeader title="Recent Verifications" action="View all" onAction={() => {}} />
+          <SectionHeader
+            title="Recent Verifications"
+            action="View all"
+            onAction={() => router.push('/requests')}
+          />
           <View className="gap-3">
             {RECENT_REQUESTS.map((r) => (
               <RequestCard
@@ -178,9 +161,9 @@ export default function HomePage() {
                 status={r.status}
                 priority={r.priority}
                 payNow={r.status === 'flag'}
-                onPress={() => {}}
+                onPress={() => router.push(`/request/${r.id}`)}
                 onMorePress={() => {}}
-                onPayPress={() => {}}
+                onPayPress={() => router.push(`/request/${r.id}`)}
               />
             ))}
           </View>
@@ -190,7 +173,7 @@ export default function HomePage() {
         <View className="h-10" />
       </Screen>
 
-      <FAB onPress={() => {}} />
+      <FAB onPress={() => router.push('/new-request')} />
     </>
   );
 }
