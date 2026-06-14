@@ -1,4 +1,5 @@
 import { PageHeader } from '@/components/PageHeader';
+import { MOCK_NOTIFICATION_COUNT } from '@/lib/mock-notifications';
 import { Screen } from '@/components/screen';
 import { EmptyState } from '@/components/ui/empty-state';
 import { FAB } from '@/components/ui/fab';
@@ -151,7 +152,12 @@ export default function RequestsPage() {
 
   return (
     <>
-      <PageHeader userInitials="JP" onProfilePress={() => router.push('/profile')} />
+      <PageHeader
+        userInitials="JP"
+        notificationCount={MOCK_NOTIFICATION_COUNT}
+        onNotificationPress={() => router.push('/alerts')}
+        onProfilePress={() => router.push('/profile')}
+      />
 
       {/* Segmented control pinned below header */}
       <StickySubHeader>

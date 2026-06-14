@@ -1,4 +1,5 @@
 import { PageHeader } from '@/components/PageHeader';
+import { MOCK_NOTIFICATION_COUNT } from '@/lib/mock-notifications';
 import { Screen } from '@/components/screen';
 import { FAB } from '@/components/ui/fab';
 import { IconChip } from '@/components/ui/icon-chip';
@@ -103,7 +104,7 @@ export default function HomePage() {
     <>
       <PageHeader
         userInitials="JP"
-        notificationCount={3}
+        notificationCount={MOCK_NOTIFICATION_COUNT}
         onNotificationPress={() => router.push('/alerts')}
         onProfilePress={() => router.push('/profile')}
       />

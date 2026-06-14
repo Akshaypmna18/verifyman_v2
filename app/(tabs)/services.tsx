@@ -1,4 +1,5 @@
 import { PageHeader } from '@/components/PageHeader';
+import { MOCK_NOTIFICATION_COUNT } from '@/lib/mock-notifications';
 import { Screen } from '@/components/screen';
 import type { IconChipTone } from '@/components/ui/icon-chip';
 import { ServiceCard } from '@/components/ui/service-card';
@@ -90,7 +91,12 @@ export default function ServicesPage() {
 
   return (
     <>
-      <PageHeader userInitials="JP" onProfilePress={() => router.push('/profile')} />
+      <PageHeader
+        userInitials="JP"
+        notificationCount={MOCK_NOTIFICATION_COUNT}
+        onNotificationPress={() => router.push('/alerts')}
+        onProfilePress={() => router.push('/profile')}
+      />
       <Screen scrollable contentClassName="px-4 py-5 gap-5">
         {/* Hero */}
         <View className="gap-1">
