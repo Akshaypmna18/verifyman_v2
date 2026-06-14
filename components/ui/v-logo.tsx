@@ -1,40 +1,25 @@
 import { cn } from '@/lib/utils';
-import { View, Text } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { useColorScheme } from 'nativewind';
+import { View } from 'react-native';
+import { SvgCss } from 'react-native-svg/css';
+import { LOGO_DARK_XML, LOGO_DEFAULT_XML } from './logo-data';
+
+// Wordmark intrinsic ratio (637.25 × 174.14)
+const ASPECT = 637.25 / 174.14;
 
 type VLogoProps = {
+  /** Rendered height in px (default 22) */
   size?: number;
   className?: string;
 };
 
 export function VLogo({ size = 22, className }: VLogoProps) {
-  const svgSize = Math.round(size * 1.28);
-  const overlap = Math.round(size * 0.32);
+  const { colorScheme } = useColorScheme();
+  const xml = colorScheme === 'dark' ? LOGO_DARK_XML : LOGO_DEFAULT_XML;
 
   return (
     <View className={cn('flex-row items-center', className)}>
-      <Svg width={svgSize} height={svgSize} viewBox="0 0 28 28">
-        <Path
-          d="M4 14.5 L11 22 L25 5"
-          stroke="#2DBE4F"
-          strokeWidth={5.4}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      </Svg>
-      <Text
-        style={{
-          fontWeight: '800',
-          fontStyle: 'italic',
-          fontSize: size,
-          letterSpacing: -0.5,
-          marginLeft: -overlap,
-        }}
-        className="text-foreground"
-      >
-        erifyman
-      </Text>
+      <SvgCss xml={xml} height={size} width={Math.round(size * ASPECT)} preserveAspectRatio="xMidYMid meet" />
     </View>
   );
 }
