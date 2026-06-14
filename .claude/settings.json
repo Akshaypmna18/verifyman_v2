@@ -1,27 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node -e \"const p=require\\('./package.json'\\); const d={...p.dependencies,...p.devDependencies}; ['react-native-svg','react-native-svg-transformer','expo-router','react-native-safe-area-context'].forEach\\(k=>console.log\\(k, d[k]||'MISSING'\\)\\)\")",
-      "Bash(pnpm add *)",
-      "Bash(grep -n \"IconChip />\\\\` —\\\\|## Screen specifications\\\\|Future screens\\\\|tone colours\\\\|### \\\\`<IconChip\" CLAUDE.md)",
-      "Bash(echo \"exit: $?\")",
-      "Bash(node -e \"require\\('./metro.config.js'\\); console.log\\('metro.config.js OK'\\)\")",
-      "Bash(node -e ' *)",
-      "Bash(node -e \"const {LOGO_DEFAULT_XML, LOGO_DARK_XML}=require\\('./components/ui/logo-data.ts'\\)\")",
-      "Bash(pnpm remove *)",
-      "Bash(echo \"tsc exit: $?\")",
-      "Bash(pnpm exec *)",
-      "Bash(rm -f *)",
-      "Bash(node -e \"console.log\\('Light SVG aspect:', 637.25 / 174.14\\); console.log\\('Dark SVG aspect:', 635.77 / 173.74\\); console.log\\('Used aspect:', 637.25 / 174.14\\);\")",
-      "Skill(run)",
-      "Skill(run:*)",
-      "Bash(pnpm android *)",
-      "Bash(echo \"PID=$!\")",
-      "Bash(adb devices *)",
-      "Bash(~/Library/Android/sdk/emulator/emulator -avd Pixel_10_Pro_XL -no-snapshot-load)",
-      "Bash(adb shell *)",
+      "Bash(pnpm install)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm ios)",
+      "Bash(pnpm android)",
+      "Bash(pnpm exec tsc --noEmit)",
+      "Bash(pnpm exec expo start *)",
+      "Bash(grep -n *)",
       "Bash(lsof -i:8081)",
-      "Bash(git remote *)"
+      "Bash(adb devices)",
+      "Bash(adb logcat *)",
+      "Bash(~/Library/Android/sdk/emulator/emulator -avd Pixel_10_Pro_XL -no-snapshot-load)",
+      "Bash(git remote -v)",
+      "Bash(git remote add *)",
+      "Skill(run)",
+      "Skill(run:*)"
     ],
     "additionalDirectories": [
       "/Users/junaidparamberi/Desktop/verifyman/.git"
