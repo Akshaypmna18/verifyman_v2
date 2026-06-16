@@ -60,6 +60,28 @@ To dive deeper into the technologies used:
 - [Nativewind Docs](https://www.nativewind.dev/)
 - [React Native Reusables](https://reactnativereusables.com)
 
+## CRUD Backend
+
+The backend in `worker/` is now a minimal public CRUD API backed by Cloudflare D1.
+
+Routes:
+
+- `GET /api/requests`
+- `POST /api/requests`
+- `GET /api/requests/:id`
+- `PATCH /api/requests/:id`
+- `DELETE /api/requests/:id`
+
+Setup:
+
+```bash
+npx wrangler d1 create verifyman
+npx wrangler d1 migrations apply verifyman --remote
+npx wrangler dev
+```
+
+The worker also accepts the alias route set under `/api/verification-requests` for compatibility.
+
 ## Deploy with EAS
 
 The easiest way to deploy your app is with [Expo Application Services (EAS)](https://expo.dev/eas).

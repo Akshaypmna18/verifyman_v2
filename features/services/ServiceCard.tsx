@@ -9,9 +9,11 @@ import { Text } from '@/components/ui/text';
 import { VerificationService } from './service-types';
 import { SERVICE_UI_META } from './services-data';
 
+import { useRouter } from 'expo-router';
+
 interface ServiceCardProps {
   service: VerificationService;
-  onPress: (service: VerificationService) => void;
+  onPress?: (service: VerificationService) => void;
   className?: string;
 }
 
@@ -20,8 +22,17 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   onPress,
   className,
 }) => {
+  const router = useRouter();
   const meta = SERVICE_UI_META[service.type];
   const Icon = meta.icon;
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress(service);
+    } else {
+      router.push(`/services/create?type=${service.type}`);
+    }
+  };
 
   return (
     <Card className={cn('flex-1 gap-0 rounded-2xl py-0 overflow-hidden flex-col', className)}>
@@ -74,7 +85,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         <Button 
           size="lg" 
           className="flex-1 rounded-full bg-primary" 
-          onPress={() => onPress(service)}
+          onPress={handlePress}
         >
           <Text className="text-[14px] font-extrabold">Get Started</Text>
           <ArrowRight size={18} strokeWidth={2.5} color="white" />

@@ -9,14 +9,9 @@ interface ServicesListProps {
   onServicePress?: (service: VerificationService) => void;
 }
 
-export const ServicesList: React.FC<ServicesListProps> = ({ onServicePress }) => {
+export const ServicesList: React.FC<ServicesListProps> = () => {
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
   
-  const handlePress = (service: VerificationService) => {
-    console.log(service.type);
-    onServicePress?.(service);
-  };
-
   // Determine number of columns
   const numColumns = isDesktop ? 3 : isTablet ? 2 : 1;
   
@@ -34,7 +29,6 @@ export const ServicesList: React.FC<ServicesListProps> = ({ onServicePress }) =>
             <ServiceCard
               key={service.id}
               service={service}
-              onPress={handlePress}
             />
           ))}
           {/* Add empty spacers for partial rows in tablet/desktop */}
