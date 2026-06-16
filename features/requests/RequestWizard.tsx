@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { addRequest, updateRequest } from './request-mock-store';
+import { VerificationRequest } from './request-mock-store';
 import { 
   CreateRequestSchema, 
   CreateRequestData, 
@@ -28,7 +30,7 @@ import { VoterIdForm } from './forms/VoterIdForm';
 import { PassportForm } from './forms/PassportForm';
 import { VehicleRCForm } from './forms/VehicleRCForm';
 
-export const RequestWizard = () => {
+export const RequestWizard = ({ existingRequest }: { existingRequest?: VerificationRequest }) => {
   const { type } = useLocalSearchParams<{ type: VerificationServiceType }>();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -38,7 +40,7 @@ export const RequestWizard = () => {
   const methods = useForm<CreateRequestData>({
     resolver: zodResolver(CreateRequestSchema),
     mode: 'onBlur',
-    defaultValues: {
+    defaultValues: existingRequest ? existingRequest.data : {
       ...INITIAL_REQUEST_STATE,
       serviceType: type || 'address-verification',
     },
@@ -98,11 +100,20 @@ export const RequestWizard = () => {
     setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
   };
 
+// ... existing imports
+
+// ... existing code
+
   const onSubmit = (data: CreateRequestData) => {
-    console.log('[SUBMIT REACHED]');
-    console.log('[FORM VALUES]', JSON.stringify(data, null, 2));
+    if (existingRequest) {
+      updateRequest(existingRequest.id, data);
+      alert('Request updated successfully!');
+    } else {
+      addRequest(data);
+      alert('Request submitted successfully!');
+    }
+    
     setIsSubmitted(true);
-    alert('Request submitted successfully! Check console for payload.');
   };
 
   const onError = (errors: any) => {

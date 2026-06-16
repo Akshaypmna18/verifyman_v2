@@ -1,11 +1,10 @@
-import { Screen } from '@/components/screen';
-import { RequestList } from '@/features/requests/request-list/RequestList';
-import { useRequests } from '@/features/requests/request-mock-store';
-import { Card } from '@/components/ui/card';
-import { Text } from '@/components/ui/text';
 import { View } from 'react-native';
+import { Text } from '../components/ui/text';
+import { RequestList } from '../features/requests/request-list/RequestList';
+import { useRequests } from '../features/requests/request-mock-store';
+import { Card } from '../components/ui/card';
 
-export default function RequestsPage() {
+export default function RequestsScreen() {
   const requests = useRequests();
 
   const total = requests.length;
@@ -14,7 +13,8 @@ export default function RequestsPage() {
   const issues = requests.filter(r => ['failed', 'insufficient', 'discrepancy'].includes(r.status)).length;
 
   return (
-    <Screen scrollable contentClassName="px-4 py-4 gap-4">
+    <View className="flex-1 bg-background">
+      <View className="p-4 gap-4">
         <View>
           <Text className="text-2xl font-bold">Requests</Text>
           <Text className="text-muted-foreground">Manage your verification requests</Text>
@@ -38,8 +38,9 @@ export default function RequestsPage() {
             <Text className="text-xl font-bold">{issues}</Text>
           </Card>
         </View>
-      
+      </View>
+
       <RequestList requests={requests} />
-    </Screen>
+    </View>
   );
 }
