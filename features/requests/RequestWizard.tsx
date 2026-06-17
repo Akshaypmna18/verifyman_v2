@@ -104,16 +104,20 @@ export const RequestWizard = ({ existingRequest }: { existingRequest?: Verificat
 
 // ... existing code
 
-  const onSubmit = (data: CreateRequestData) => {
-    if (existingRequest) {
-      updateRequest(existingRequest.id, data);
-      alert('Request updated successfully!');
-    } else {
-      addRequest(data);
-      alert('Request submitted successfully!');
+  const onSubmit = async (data: CreateRequestData) => {
+    try {
+      if (existingRequest) {
+        await updateRequest(existingRequest.id, data);
+        alert('Request updated successfully!');
+      } else {
+        await addRequest(data);
+        alert('Request submitted successfully!');
+      }
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('Failed to submit request. Please check your connection and try again.');
     }
-    
-    setIsSubmitted(true);
   };
 
   const onError = (errors: any) => {

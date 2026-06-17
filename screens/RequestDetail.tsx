@@ -1,8 +1,8 @@
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, Alert, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
-import { useRequests } from '../features/requests/request-mock-store';
+import { useRequests, deleteRequest } from '../features/requests/request-mock-store';
 import { RequestHeader } from '../features/requests/request-detail/RequestHeader';
 import { ServiceDetailRenderer } from '../features/requests/request-detail/ServiceDetailRenderer';
 import { Card } from '@/components/ui/card';
@@ -13,6 +13,46 @@ export default function RequestDetailScreen() {
   const router = useRouter();
   const requests = useRequests();
   const request = requests.find(r => r.id === id);
+
+  const handleDelete = () => {
+    const title = 'Delete Request';
+    const message = 'Are you sure you want to delete this request?\n\nThis action cannot be undone.';
+
+    if (Platform.OS === 'web') {
+      if (confirm(`${title}\n\n${message}`)) {
+        performDelete();
+      }
+      return;
+    }
+
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive',
+          onPress: performDelete
+        },
+      ]
+    );
+  };
+
+  const performDelete = async () => {
+    try {
+      if (id) {
+        await deleteRequest(id);
+        router.replace('/(tabs)/requests');
+      }
+    } catch (error) {
+      if (Platform.OS === 'web') {
+        alert('Failed to delete request. Please try again.');
+      } else {
+        Alert.alert('Error', 'Failed to delete request. Please try again.');
+      }
+    }
+  };
 
   if (!request) {
     return (
@@ -48,7 +88,10 @@ export default function RequestDetailScreen() {
           <Text>Back</Text>
         </Button>
         <Button onPress={() => router.push(`/requests/${id}/edit`)} className="flex-1">
-          <Text>Edit Request</Text>
+          <Text>Edit</Text>
+        </Button>
+        <Button variant="ghost" onPress={handleDelete} className="flex-1 border border-destructive/20">
+          <Text className="text-destructive">Delete</Text>
         </Button>
       </View>
     </Screen>

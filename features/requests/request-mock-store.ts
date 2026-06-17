@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { VerificationServiceType, CreateRequestData } from '../request-types';
+import { requestToCreateDto, dtoToRequest, requestToUpdateDto } from './api/request.mapper';
+import { RequestDto } from './api/request.dto';
+import { apiClient } from './api/client';
 
 export type RequestStatus = 
   | 'pending' 
@@ -20,8 +23,8 @@ export interface VerificationRequest {
   data: CreateRequestData;
 }
 
-// In-memory storage
-let requests: VerificationRequest[] = [];
+// In-memory cache for simplicity during transition, but primary source is now API
+let cachedRequests: VerificationRequest[] = [];
 const listeners = new Set<() => void>();
 
 const notify = () => {
@@ -29,10 +32,23 @@ const notify = () => {
 };
 
 export const useRequests = (): VerificationRequest[] => {
-  const [data, setData] = useState(requests);
+  const [data, setData] = useState(cachedRequests);
 
   useEffect(() => {
-    const listener = () => setData([...requests]);
+    const fetchRequests = async () => {
+      try {
+        const response = await apiClient.getRequests();
+        const mapped = response.requests.map(dtoToRequest);
+        cachedRequests = mapped;
+        setData(mapped);
+      } catch (error) {
+        console.error('Failed to fetch requests:', error);
+      }
+    };
+
+    fetchRequests();
+
+    const listener = () => setData([...cachedRequests]);
     listeners.add(listener);
     return () => {
       listeners.delete(listener);
@@ -42,38 +58,88 @@ export const useRequests = (): VerificationRequest[] => {
   return data;
 };
 
-export const getRequestById = (id: string): VerificationRequest | undefined => {
-  return requests.find(r => r.id === id);
-};
-
-export const addRequest = (data: CreateRequestData) => {
-  const newRequest: VerificationRequest = {
-    id: Math.random().toString(36).substring(7),
-    referenceNumber: `VRF-${Math.floor(10000 + Math.random() * 90000)}`,
-    candidateName: `${data.candidate.firstName} ${data.candidate.lastName}`,
-    serviceType: data.serviceType,
-    status: 'pending',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    data,
-  };
-  requests.push(newRequest);
-  notify();
-  return newRequest;
-};
-
-export const updateRequest = (id: string, data: CreateRequestData) => {
-  const index = requests.findIndex(r => r.id === id);
-  if (index !== -1) {
-    requests[index] = {
-      ...requests[index],
-      candidateName: `${data.candidate.firstName} ${data.candidate.lastName}`,
-      serviceType: data.serviceType,
-      updatedAt: new Date().toISOString(),
-      data,
-    };
-    notify();
-    return requests[index];
+export const getRequestById = async (id: string): Promise<VerificationRequest | undefined> => {
+  try {
+    const response = await apiClient.getRequest(id);
+    return dtoToRequest(response.request);
+  } catch (error) {
+    console.error(`Failed to fetch request ${id}:`, error);
+    return undefined;
   }
-  return undefined;
+};
+
+export const useRequest = (id: string) => {
+  const [request, setRequest] = useState<VerificationRequest | undefined>(
+    cachedRequests.find(r => r.id === id)
+  );
+  const [loading, setLoading] = useState(!request);
+
+  useEffect(() => {
+    const fetchRequest = async () => {
+      setLoading(true);
+      const data = await getRequestById(id);
+      if (data) {
+        setRequest(data);
+        // Update cache
+        const index = cachedRequests.findIndex(r => r.id === id);
+        if (index !== -1) {
+          cachedRequests[index] = data;
+        } else {
+          cachedRequests.push(data);
+        }
+        notify();
+      }
+      setLoading(false);
+    };
+
+    fetchRequest();
+  }, [id]);
+
+  return { request, loading };
+};
+
+export const addRequest = async (data: CreateRequestData) => {
+  try {
+    const dto = requestToCreateDto(data);
+    const response = await apiClient.createRequest(dto);
+    const newRequest = dtoToRequest(response.request);
+    
+    cachedRequests.push(newRequest);
+    notify();
+    return newRequest;
+  } catch (error) {
+    console.error('Failed to add request:', error);
+    throw error;
+  }
+};
+
+export const updateRequest = async (id: string, data: CreateRequestData) => {
+  try {
+    const dto = requestToCreateDto(data); // Using requestToCreateDto as a base for update as well, or we could have a specific mapper
+    // Actually requestToUpdateDto exists in mapper but let's see if it's better
+    const updateDto = requestToUpdateDto(data);
+    const response = await apiClient.updateRequest(id, updateDto);
+    const updatedRequest = dtoToRequest(response.request);
+
+    const index = cachedRequests.findIndex(r => r.id === id);
+    if (index !== -1) {
+      cachedRequests[index] = updatedRequest;
+      notify();
+    }
+    return updatedRequest;
+  } catch (error) {
+    console.error(`Failed to update request ${id}:`, error);
+    throw error;
+  }
+};
+
+export const deleteRequest = async (id: string) => {
+  try {
+    await apiClient.deleteRequest(id);
+    cachedRequests = cachedRequests.filter(r => r.id !== id);
+    notify();
+  } catch (error) {
+    console.error(`Failed to delete request ${id}:`, error);
+    throw error;
+  }
 };
