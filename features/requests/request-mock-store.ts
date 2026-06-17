@@ -31,18 +31,25 @@ const notify = () => {
   listeners.forEach(listener => listener());
 };
 
-export const useRequests = (): VerificationRequest[] => {
+export const useRequests = () => {
   const [data, setData] = useState(cachedRequests);
+  const [loading, setLoading] = useState(cachedRequests.length === 0);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const fetchRequests = async () => {
       try {
+        setLoading(true);
         const response = await apiClient.getRequests();
         const mapped = response.requests.map(dtoToRequest);
         cachedRequests = mapped;
         setData(mapped);
-      } catch (error) {
-        console.error('Failed to fetch requests:', error);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch requests:', err);
+        setError(err instanceof Error ? err : new Error('Failed to fetch requests'));
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -55,7 +62,7 @@ export const useRequests = (): VerificationRequest[] => {
     };
   }, []);
 
-  return data;
+  return { requests: data, loading, error };
 };
 
 export const getRequestById = async (id: string): Promise<VerificationRequest | undefined> => {

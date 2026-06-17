@@ -11,7 +11,7 @@ import { Screen } from '@/components/screen';
 export default function RequestDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const requests = useRequests();
+  const { requests } = useRequests();
   const request = requests.find(r => r.id === id);
 
   const handleDelete = () => {

@@ -5,7 +5,7 @@ import { useRequests } from '../features/requests/request-mock-store';
 import { Card } from '../components/ui/card';
 
 export default function RequestsScreen() {
-  const requests = useRequests();
+  const { requests } = useRequests();
 
   const total = requests.length;
   const running = requests.filter(r => r.status === 'running').length;

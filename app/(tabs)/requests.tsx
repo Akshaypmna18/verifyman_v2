@@ -6,7 +6,23 @@ import { Text } from '@/components/ui/text';
 import { View } from 'react-native';
 
 export default function RequestsPage() {
-  const requests = useRequests();
+  const { requests, loading, error } = useRequests();
+
+  if (loading && requests.length === 0) {
+    return (
+      <Screen contentClassName="items-center justify-center p-6">
+        <Text>Loading requests...</Text>
+      </Screen>
+    );
+  }
+
+  if (error) {
+    return (
+      <Screen contentClassName="items-center justify-center p-6">
+        <Text className="text-destructive">Error loading requests.</Text>
+      </Screen>
+    );
+  }
 
   const total = requests.length;
   const running = requests.filter(r => r.status === 'running').length;

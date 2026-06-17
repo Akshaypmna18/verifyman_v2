@@ -9,7 +9,7 @@ import { Screen } from '@/components/screen';
 export default function EditRequestScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const requests = useRequests();
+  const { requests } = useRequests();
   const request = requests.find(r => r.id === id);
 
   if (!request) {
