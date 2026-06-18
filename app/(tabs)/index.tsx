@@ -20,12 +20,21 @@ import { useMemo } from 'react';
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 function QuickActions({ onSelect }: { onSelect: (id: string) => void }) {
-  const quickServices = SERVICES_DATA.slice(0, 4);
+  const dashboardServiceTypes = [
+    'driving-license-verification',
+    'employment-verification',
+    'passport-verification',
+    'address-verification',
+  ];
+
+  const quickServices = dashboardServiceTypes
+    .map((type) => SERVICES_DATA.find((s) => s.type === type))
+    .filter((s): s is NonNullable<typeof s> => !!s);
 
   return (
     <View>
       <SectionHeader title="Quick Request" />
-      <View className="flex-row justify-between gap-2">
+      <View className="flex-row gap-2">
         {quickServices.map((s) => {
           const meta = SERVICE_UI_META[s.type];
           return (
@@ -155,6 +164,7 @@ export default function HomePage() {
                   caption={s.caption}
                   icon={s.icon}
                   tone={s.tone}
+                  onPress={() => router.push('/requests')}
                 />
               </View>
             ))}
@@ -162,7 +172,7 @@ export default function HomePage() {
         </View>
 
         {/* Quick actions */}
-        <QuickActions onSelect={(type) => router.push(`/new-request?type=${type}`)} />
+        <QuickActions onSelect={(type) => router.push(`/services/create?type=${type}`)} />
 
         {/* Recent verifications */}
         <View>
@@ -216,7 +226,7 @@ export default function HomePage() {
         <View className="h-10" />
       </Screen>
 
-      <FAB onPress={() => router.push('/new-request')} />
+      <FAB onPress={() => router.push('/services')} />
     </>
   );
 }

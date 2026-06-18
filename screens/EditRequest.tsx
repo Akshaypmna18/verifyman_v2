@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useRequests } from '../features/requests/request-mock-store';
 import { RequestWizard } from '../features/requests/RequestWizard';
 import { Screen } from '@/components/screen';
+import { BackHeader } from '@/components/PageHeader';
 
 export default function EditRequestScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,11 +25,13 @@ export default function EditRequestScreen() {
   }
 
   return (
-    <Screen scrollable>
-      <View className="p-4">
-        <Text className="text-xl font-bold mb-4">Edit Request</Text>
-        <RequestWizard existingRequest={request} />
-      </View>
-    </Screen>
+    <>
+      <BackHeader title="Edit Request" onBack={() => router.back()} />
+      <Screen scrollable contentClassName="flex-1">
+        <View className="px-4 py-6 flex-1">
+          <RequestWizard existingRequest={request} />
+        </View>
+      </Screen>
+    </>
   );
 }

@@ -184,7 +184,7 @@ export const RequestWizard = ({ existingRequest }: { existingRequest?: Verificat
           isAllCompleted={isSubmitted}
         />
         
-        <View className="flex-1 bg-card border border-border rounded-3xl p-6">
+        <View className="flex-1 bg-card border border-border rounded-[20px] p-6">
           <Text className="text-[22px] font-extrabold text-foreground mb-6">
             {isSubmitted ? 'Success' : currentStep.title}
           </Text>
